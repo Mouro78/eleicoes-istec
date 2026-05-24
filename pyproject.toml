@@ -1,0 +1,20 @@
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+
+[tool.pylint.main]
+ignore = [".venv"]
+
+[tool.pylint.format]
+max-line-length = 100
+
+[tool.pylint."messages control"]
+disable = [
+    "missing-module-docstring",
+    "too-few-public-methods",
+]
+
+[tool.coverage.run]
+source = ["src/eleicoes"]
+omit = ["tests/*"]

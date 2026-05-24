@@ -1,5 +1,13 @@
 class Partido:
-    """Representa um partido político concorrente nas eleições."""
+    """Representa um partido político concorrente nas eleições.
+        # getter (encapsulamento)construtor + validações + normalização
+        # getter (encapsulamento)
+        # getter (encapsulamento)
+        # identidade lógica (por sigla)
+        # uso em set / dict
+        # representação amigável
+        # representação técnica
+    """
 
     def __init__(self, sigla, nome):      
       
@@ -29,3 +37,9 @@ class Partido:
     
     def __hash__(self):
         return hash(self._sigla)
+    
+    def __str__(self):
+        return "{} - {}".format(self._sigla, self._nome)
+    
+    def __repr__(self):
+        return "Partido(sigla={!r}, nome={!r})".format(self._sigla, self._nome)

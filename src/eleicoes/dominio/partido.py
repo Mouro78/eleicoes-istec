@@ -13,6 +13,8 @@ class Partido:
         
         self._sigla = sigla
         self._nome = nome
+
+    
     
     def obter_sigla(self):
         return self._sigla
@@ -20,3 +22,10 @@ class Partido:
     def obter_nome(self):
         return self._nome
     
+    def __eq__(self, other ):
+        if not isinstance(other ,Partido):
+            return NotImplemented
+        return self._sigla == other._sigla
+    
+    def __hash__(self):
+        return hash(self._sigla)

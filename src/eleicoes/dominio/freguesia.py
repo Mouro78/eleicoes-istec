@@ -29,3 +29,7 @@ class Freguesia:
         self._votos_partido = votos_partido
         self._votos_brancos = votos_brancos
         self._votos_nulos = votos_nulos
+
+    def obter_total_votantes(self):
+        """Devolve o total de votos(partidos + brancos + nulos)"""
+        return sum(self._votos_partido.values()) +self._votos_brancos + self._votos_nulos

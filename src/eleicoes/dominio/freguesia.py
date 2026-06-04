@@ -29,6 +29,15 @@ class Freguesia:
         """Regista os resultados da votação (só pode ser feito uma vez)."""
         if self._resultados_registados:
             raise RuntimeError("Esta freguesia já tem resultados registados")
+        if votos_brancos < 0 or votos_nulos < 0:
+            raise ValueError("Votos brancos/nulos não podem ser negativos")
+        for votos in votos_partido.values():
+            if votos < 0:
+                raise ValueError("Votos de um partido não podem ser negativos")
+
+        total = sum(votos_partido.values()) + votos_brancos + votos_nulos
+        if total > self._eleitores_inscritos:
+            raise ValueError("Total de votos excede eleitores inscritos")
 
         self._votos_partido = votos_partido
         self._votos_brancos = votos_brancos
@@ -63,3 +72,17 @@ class Freguesia:
     def obter_votos_por_partido(self):
         """Devolve uma cópia do dicionário de votos por partido."""
         return dict(self._votos_partido)
+
+    def __eq__(self, other):
+        if not isinstance(other, Freguesia):
+            return NotImplemented
+        return self._codigo == other._codigo
+
+    def __hash__(self):
+        return hash(self._codigo)
+
+    def __str__(self):
+        return f"{self._nome} ({self._codigo})"
+
+    def __repr__(self):
+        return f"Freguesia(codigo={self._codigo!r}, nome={self._nome!r})"

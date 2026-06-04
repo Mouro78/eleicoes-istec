@@ -6,6 +6,7 @@ class Freguesia:
         self._codigo = codigo
         self._nome = nome
         self._eleitores_inscritos = eleitores_inscritos
+        self._resultados_registados = False
 
         #Inicialização dos votos (Freguesia vazia)
         self._votos_partido = {}
@@ -25,10 +26,15 @@ class Freguesia:
         return self._eleitores_inscritos
 
     def registar_resultado(self, votos_partido, votos_brancos, votos_nulos):
-        """Recebe os votos"""
+        """Regista os resultados da votação (só pode ser feito uma vez)."""
+        if self._resultados_registados:
+            raise RuntimeError("Esta freguesia já tem resultados registados")
+
         self._votos_partido = votos_partido
         self._votos_brancos = votos_brancos
         self._votos_nulos = votos_nulos
+
+        self._resultados_registados = True
 
     def obter_total_votantes(self):
         """Devolve o total de votos(partidos + brancos + nulos)"""
@@ -38,7 +44,7 @@ class Freguesia:
         """Devolve a taxa de abstenção (entre 0.0 e 1.0)"""
         if self.obter_eleitores_inscritos() == 0:
             return 0.0
-        return 1 - (self.obter_total_votantes() / self._eleitores_inscritos )
+        return 1 - (self.obter_total_votantes() / self.obter_eleitores_inscritos())
 
     def obter_vencedor(self):
         """Devolve o partido mais votado, ou none se não houver votos"""

@@ -39,3 +39,9 @@ class Freguesia:
         if self.obter_eleitores_inscritos == 0:
             return 0.0
         return 1 - (self.obter_total_votantes() / self._eleitores_inscritos )
+
+    def obter_vencedor(self):
+        """Devolve o partido mais votado, ou none se não houver votos"""
+        if not self._votos_partido:
+            return None
+        return max(self._votos_partido, key=self._votos_partido.get)

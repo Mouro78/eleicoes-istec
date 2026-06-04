@@ -36,7 +36,7 @@ class Freguesia:
 
     def calcular_abstencao(self):
         """Devolve a taxa de abstenção (entre 0.0 e 1.0)"""
-        if self.obter_eleitores_inscritos == 0:
+        if self.obter_eleitores_inscritos() == 0:
             return 0.0
         return 1 - (self.obter_total_votantes() / self._eleitores_inscritos )
 
@@ -45,3 +45,15 @@ class Freguesia:
         if not self._votos_partido:
             return None
         return max(self._votos_partido, key=self._votos_partido.get)
+
+    def obter_votos_brancos(self):
+        """Devolve o numero de votos em branco"""
+        return self._votos_brancos
+
+    def obter_votos_nulos(self):
+        """devolve o número de votos nulos"""
+        return self._votos_nulos
+
+    def obter_votos_por_partido(self):
+        """Devolve uma cópia do dicionário de votos por partido."""
+        return dict(self._votos_partido)

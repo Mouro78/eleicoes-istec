@@ -1,0 +1,15 @@
+{
+  "110601": {
+    "nome": "Ajuda",
+    "eleitores_inscritos": 18000,
+    "votos_partido": {
+      "PS": 3000,
+      "PSD": 2000,
+      "CH": 800
+    },
+    "votos_brancos": 200,
+    "votos_nulos": 100,
+    "total_votantes": 6100,
+    "abstencao": 0.6611
+  }
+}

@@ -5,7 +5,6 @@ Projeto final da cadeira **PIV** (ISTEC, LEI).
 ## Autores
 
 - Pedro Mouro
-- Daniel Batalha
 
 ## Descrição
 
@@ -19,22 +18,36 @@ de comunicação social. Compõe-se de três componentes:
 ## Tecnologias
 
 - Python 3.14
+- FastAPI 0.136 + Uvicorn 0.49 (servidores)
+- Pydantic 2.13 (validação de dados)
 - pytest 9.0.3 (testes)
 - pytest-cov 7.1.0 (cobertura de testes)
 - pylint 4.0.5 (análise estática)
 
 ## Estrutura do projeto
+
+```
 eleicoes-istec/
-├── data/                       # CSVs de freguesias, partidos, eleitores
+├── data/                       # CSV de freguesias e JSON de resultados
+│   ├── freguesias.csv          # 3092 freguesias de Portugal (gerado)
+│   ├── gerar_csv.py            # Script para (re)gerar o CSV
+│   └── resultados.json         # Resultados arquivados pelo servidor CNE
 ├── docs/                       # Documentação técnica
 ├── src/
 │   └── eleicoes/
-│       └── dominio/            # Classes do domínio (Partido, Freguesia, ...)
+│       ├── dominio/            # Classes do domínio
+│       │   ├── partido.py
+│       │   ├── freguesia.py
+│       │   ├── concelho.py
+│       │   └── distrito.py
+│       ├── produtor.py         # Simulador de votações
+│       └── servidor_cne.py     # Servidor CNE (FastAPI)
 ├── tests/
 │   └── dominio/                # Testes unitários do domínio
-├── .vscode/                    # Configurações partilhadas do VS Code
 ├── pyproject.toml              # Configuração de pytest, pylint, coverage
 └── requirements.txt            # Dependências do projeto
+```
+
 ## Como começar
 
 ### 1. Clonar o repositório
@@ -66,7 +79,27 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+### 4. Gerar o CSV de freguesias
+
+```bash
+python data/gerar_csv.py
+```
+
 ## Como correr
+
+### Produtor de votos
+
+```powershell
+$env:PYTHONPATH="src"; python src/eleicoes/produtor.py
+```
+
+### Servidor CNE
+
+```powershell
+$env:PYTHONPATH="src"; uvicorn eleicoes.servidor_cne:app --reload
+```
+
+Documentação interativa disponível em: `http://127.0.0.1:8000/docs`
 
 ### Testes
 
@@ -92,15 +125,16 @@ pylint src/eleicoes
 
 - [x] Estrutura inicial do projeto
 - [x] Configuração de pytest, pylint, coverage
-- [x] Classe `Partido` (com testes; 100% cobertura; pylint 10/10)
-- [x] Classe `Freguesia` (com testes; 100% cobertura; pylint 10/10)
+- [x] Classe `Partido` (com testes; pylint 10/10)
+- [x] Classe `Freguesia` (com testes; pylint 10/10)
+- [x] Classe `Concelho` (com testes; pylint 10/10)
+- [x] Classe `Distrito` (com testes; pylint 10/10)
+- [x] Gerador de CSV com 3092 freguesias de Portugal
+- [x] Produtor de votos — simula eleição completa (pylint 10/10)
+- [x] Servidor CNE — recebe, valida e arquiva resultados (pylint 10/10)
 
 ### Em desenvolvimento
 
-- [ ] Classes `Concelho`, `Distrito`
-- [ ] Carregador de dados (CSV das freguesias e partidos)
-- [ ] Produtor de votos
-- [ ] Servidor CNE (FastAPI)
 - [ ] Servidor Público (FastAPI)
 - [ ] Exportadores (JSON, XLSX, gráfico)
 

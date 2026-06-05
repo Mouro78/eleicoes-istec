@@ -1,3 +1,6 @@
+from collections import Counter
+
+
 class Concelho:
     """Classe que representa um concelho de Portugal, que agrega freguesias"""
 
@@ -42,3 +45,31 @@ class Concelho:
         if self.obter_eleitores_inscritos() == 0:
             return 0.0
         return 1 -(self.obter_total_votantes() / self.obter_eleitores_inscritos())
+
+    def obter_votos_por_partido(self):
+        """Devolve o dicionário agregado de votos por partido no concelho."""
+        agregado = Counter()
+        for freguesia in self._freguesias.values():
+            agregado.update(freguesia.obter_votos_por_partido())
+        return dict(agregado)
+
+    def obter_vencedor(self):
+        """Devolve o partido com mais votos no concelho."""
+        votos = self.obter_votos_por_partido()
+        if not votos:
+            raise ValueError(f"Concelho '{self._nome}' não tem votos registados")
+        return Counter(votos).most_common(1)[0][0]
+
+    def __eq__(self, other):
+        if not isinstance(other, Concelho):
+            return NotImplemented
+        return self._codigo == other._codigo
+
+    def __hash__(self):
+        return hash(self._codigo)
+
+    def __str__(self):
+        return f"{self._nome} ({self._codigo})"
+
+    def __repr__(self):
+        return f"Concelho(codigo={self._codigo!r}, nome={self._nome!r})"

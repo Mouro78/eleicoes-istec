@@ -2,7 +2,7 @@ from collections import Counter
 
 
 class Concelho:
-    """Classe que representa um concelho de Portugal, que agrega freguesias"""
+    """Classe que representa um Concelho de Portugal, que agrega freguesias"""
 
     def __init__(self, codigo, nome):
         self._codigo = codigo

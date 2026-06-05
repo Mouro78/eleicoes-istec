@@ -94,10 +94,10 @@ pylint src/eleicoes
 - [x] Configuração de pytest, pylint, coverage
 - [x] Classe `Partido` (com testes; 100% cobertura; pylint 10/10)
 - [x] Classe `Freguesia` (com testes; 100% cobertura; pylint 10/10)
-
+- [x] Classes `Concelho` (com testes; 100% cobertura; pylint 10/10)
 ### Em desenvolvimento
 
-- [ ] Classes `Concelho`, `Distrito`
+- [ ] `Distrito`
 - [ ] Carregador de dados (CSV das freguesias e partidos)
 - [ ] Produtor de votos
 - [ ] Servidor CNE (FastAPI)

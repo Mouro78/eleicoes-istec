@@ -95,7 +95,7 @@ pylint src/eleicoes
 - [x] Classe `Partido` (com testes; 100% cobertura; pylint 10/10)
 - [x] Classe `Freguesia` (com testes; 100% cobertura; pylint 10/10)
 - [x] Classes `Concelho` (com testes; 100% cobertura; pylint 10/10)
-- [ ] Classes `Distrito` (com testes; 100% cobertura; pylint 10/10)
+- [X] Classes `Distrito` (com testes; 100% cobertura; pylint 10/10)
 ### Em desenvolvimento
 
 - [ ] Carregador de dados (CSV das freguesias e partidos)

@@ -93,11 +93,26 @@ class ServidorCNE(http.server.BaseHTTPRequestHandler):
 
 
     def do_GET(self):
-        # TODO: implementar consultas (totais, abstenção, etc.)
-        self.send_response(501)
-        self.send_header("Content-type", "application/json")
+        # 1. Carregar os resultados guardados no JSON
+        resultados = carregar_resultados()
+
+        # 2. Se ainda não houver dados, devolver uma mensagem amigável
+        if not resultados:
+            self.send_response(200)
+            self.send_header("Content-type", "application/json; charset=utf-8")
+            self.end_headers()
+            resposta = {"mensagem": "Ainda não foram recebidos dados de votação."}
+            self.wfile.write(json.dumps(resposta, ensure_ascii=False).encode("utf-8"))
+            return
+
+        # 3. Se existirem dados, calcular os totais nacionais
+        totais_votos = calcular_totais(resultados)
+
+        # 4. Responder com sucesso (200 OK) e enviar os totais em JSON
+        self.send_response(200)
+        self.send_header("Content-type", "application/json; charset=utf-8")
         self.end_headers()
-        self.wfile.write(json.dumps({"erro": "Não implementado"}).encode("utf-8"))
+        self.wfile.write(json.dumps(totais_votos, ensure_ascii=False, indent=2).encode("utf-8"))
 
 
 def arrancar_servidor():

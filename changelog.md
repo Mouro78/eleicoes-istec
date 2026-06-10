@@ -9,5 +9,7 @@
 - [x] Classe `Distrito` (com testes; pylint 10/10)
 - [x] Gerador de CSV com 3092 freguesias de Portugal
 - [x] Produtor de votos — simula eleição completa (pylint 10/10)
-- 
+- [X] Servidor CNE — recebe, valida e arquiva resultados
+- [X] Servidor Público (http.server)
+- [X] Exportadores (JSON, XLSX, gráfico)
 

@@ -1,6 +1,6 @@
 
 ### Em desenvolvimento
 - [ ] Servidor CNE — recebe, valida e arquiva resultados
-- [ ] Servidor Público (FastAPI)
+- [ ] Servidor Público (http.server)
 - [ ] Exportadores (JSON, XLSX, gráfico)
 

@@ -2,7 +2,7 @@
 
 
 - [x] Estrutura inicial do projeto
-- [x] Configuração de pytest, pylint, coverage
+- [x] Configuração de unittest, pylint, coverage
 - [x] Classe `Partido` (com testes; pylint 10/10)
 - [x] Classe `Freguesia` (com testes; pylint 10/10)
 - [x] Classe `Concelho` (com testes; pylint 10/10)

@@ -93,10 +93,18 @@ class ServidorCNE(http.server.BaseHTTPRequestHandler):
 
 
     def do_GET(self):
+        # TODO: implementar consultas (totais, abstenção, etc.)
+        self.send_response(501)
+        self.send_header("Content-type", "application/json")
+        self.end_headers()
+        self.wfile.write(json.dumps({"erro": "Não implementado"}).encode("utf-8"))
+
 
 def arrancar_servidor():
     with socketserver.TCPServer(("", PORTA), ServidorCNE) as httpd:
         print(f"Servidor CNE a correr na porta {PORTA}")
         httpd.serve_forever()
 
-arrancar_servidor()
+
+if __name__ == "__main__":
+    arrancar_servidor()

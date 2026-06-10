@@ -18,10 +18,9 @@ de comunicação social. Compõe-se de três componentes:
 ## Tecnologias
 
 - Python 3.14
-- FastAPI 0.136 + Uvicorn 0.49 (servidores)
-- Pydantic 2.13 (validação de dados)
-- pytest 9.0.3 (testes)
-- pytest-cov 7.1.0 (cobertura de testes)
+- http.server (biblioteca padrão — servidores)
+- unittest (biblioteca padrão — testes)
+- coverage 7.14.0 (cobertura de testes)
 - pylint 4.0.5 (análise estática)
 
 ## Estrutura do projeto
@@ -41,10 +40,10 @@ eleicoes-istec/
 │       │   ├── concelho.py
 │       │   └── distrito.py
 │       ├── produtor.py         # Simulador de votações
-│       └── servidor_cne.py     # Servidor CNE (FastAPI)
+│       └── servidor_cne.py     # Servidor CNE (http.server)
 ├── tests/
 │   └── dominio/                # Testes unitários do domínio
-├── pyproject.toml              # Configuração de pytest, pylint, coverage
+├── pyproject.toml              # Configuração de pylint e coverage
 └── requirements.txt            # Dependências do projeto
 ```
 
@@ -96,21 +95,22 @@ $env:PYTHONPATH="src"; python src/eleicoes/produtor.py
 ### Servidor CNE
 
 ```powershell
-$env:PYTHONPATH="src"; uvicorn eleicoes.servidor_cne:app --reload
+python src/eleicoes/servidor_cne.py
 ```
 
-Documentação interativa disponível em: `http://127.0.0.1:8000/docs`
+O servidor fica disponível em: `http://127.0.0.1:8000`
 
 ### Testes
 
 ```bash
-pytest
+python -m unittest discover -v
 ```
 
 ### Testes com cobertura
 
 ```bash
-pytest --cov=src/eleicoes
+coverage run -m unittest discover
+coverage report
 ```
 
 ### Análise estática (pylint)
@@ -124,7 +124,7 @@ pylint src/eleicoes
 ### Concluído
 
 - [x] Estrutura inicial do projeto
-- [x] Configuração de pytest, pylint, coverage
+- [x] Configuração de unittest, pylint, coverage
 - [x] Classe `Partido` (com testes; pylint 10/10)
 - [x] Classe `Freguesia` (com testes; pylint 10/10)
 - [x] Classe `Concelho` (com testes; pylint 10/10)
@@ -135,7 +135,7 @@ pylint src/eleicoes
 
 ### Em desenvolvimento
 
-- [ ] Servidor Público (FastAPI)
+- [ ] Servidor Público (http.server)
 - [ ] Exportadores (JSON, XLSX, gráfico)
 
 ### Bónus considerados

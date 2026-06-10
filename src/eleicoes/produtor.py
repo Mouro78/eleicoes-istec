@@ -42,7 +42,9 @@ PARTIDOS = [
 
 def distribuir_votos_partidos(votos_validos, partidos, rng):
     """Distribui votos válidos proporcionalmente pelos partidos."""
-    pesos = [rng.random() for _ in partidos]
+    pesos = []
+    for _ in partidos:
+        pesos.append(rng.random())
     total_pesos = sum(pesos)
 
     votos_partido = {}
@@ -69,7 +71,6 @@ def gerar_votos_freguesia(eleitores, partidos, rng):
     Returns:
         tuple: (votos_partido, brancos, nulos)
     """
-    x=0.01 #mnbmnbmnbmnbmnbmnb
     taxa_participacao = rng.uniform(0.40, 0.75)
     total_votantes = int(eleitores * taxa_participacao)
     brancos = int(total_votantes * rng.uniform(0.01, 0.05))

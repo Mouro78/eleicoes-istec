@@ -69,6 +69,7 @@ def gerar_votos_freguesia(eleitores, partidos, rng):
     Returns:
         tuple: (votos_partido, brancos, nulos)
     """
+    x=0.01 #mnbmnbmnbmnbmnbmnb
     taxa_participacao = rng.uniform(0.40, 0.75)
     total_votantes = int(eleitores * taxa_participacao)
     brancos = int(total_votantes * rng.uniform(0.01, 0.05))
@@ -128,7 +129,7 @@ def construir_hierarquia(linhas, partidos, rng):
 
         # Criar Freguesia e registar votos
         freguesia = Freguesia(cod_freguesia, linha["freguesia"], eleitores)
-        votos_partido, brancos, nulos = gerar_votos_freguesia(
+        (votos_partido, brancos, nulos) = gerar_votos_freguesia(
             eleitores, partidos, rng
         )
         freguesia.registar_resultado(votos_partido, brancos, nulos)

@@ -86,8 +86,9 @@ def calcular_distritos(resultados):
 
 
 class ServidorCNE(http.server.BaseHTTPRequestHandler):
-
+    """Servidor HTTP que recebe resultados do Produtor e responde a consultas."""
     def do_POST(self):
+        """Recebe e valida resultados de uma freguesia via POST."""
         # 1. Ler os dados — Content-Length diz quantos bytes ler
         comprimento = int(self.headers["Content-Length"])
         corpo = self.rfile.read(comprimento)  # lê exactamente esse número de bytes
@@ -134,6 +135,7 @@ class ServidorCNE(http.server.BaseHTTPRequestHandler):
         self.wfile.write(json.dumps({"mensagem": "Freguesia registada com sucesso"}).encode("utf-8"))
 
     def do_GET(self):
+        """Responde a consultas de totais, partidos e distritos via GET."""
         # Carregar resultados do ficheiro JSON
         resultados = carregar_resultados()
 
@@ -158,19 +160,18 @@ class ServidorCNE(http.server.BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(json.dumps(resposta, ensure_ascii=False).encode("utf-8"))
 
-    def log_message(self, format, *args):
+    def log_message(self, format, *args): # pylint: disable=redefined-builtin
         """Silencia os logs automáticos do servidor."""
-        pass
 
 
 def arrancar_servidor():
     """Arranca o servidor CNE na porta definida."""
     with socketserver.TCPServer(("", PORTA), ServidorCNE) as httpd:
         print(f"Servidor CNE a correr na porta {PORTA}")
-        print(f"  POST /resultados   -> recebe votos do Produtor")
-        print(f"  GET  /totais       -> totais nacionais")
-        print(f"  GET  /partidos     -> votos por partido")
-        print(f"  GET  /distritos    -> votos por distrito")
+        print("  POST /resultados   -> recebe votos do Produtor")
+        print("  GET  /totais       -> totais nacionais")
+        print("  GET  /partidos     -> votos por partido")
+        print("  GET  /distritos    -> votos por distrito")
         httpd.serve_forever()
 
 

@@ -33,7 +33,9 @@ def calcular_totais_e_abstencao(resultados):
     return totais
 
 class ServidorPublico(http.server.BaseHTTPRequestHandler):
+    """Servidor HTTP público que disponibiliza resultados eleitorais em HTML."""
     def do_GET(self):
+        """Serve a página HTML com os resultados eleitorais consolidados."""
         resultados = carregar_resultados()
 
         # 1. Configurar cabeçalhos para responder em HTML (text/html)
@@ -113,6 +115,7 @@ class ServidorPublico(http.server.BaseHTTPRequestHandler):
         self.wfile.write(html.encode("utf-8"))
 
 def arrancar_servidor_publico():
+    """Arranca o Servidor Público na porta definida."""
     with socketserver.TCPServer(("", PORTA_PUBLICA), ServidorPublico) as httpd:
         print(f"Servidor Público a correr em http://localhost:{PORTA_PUBLICA}")
         httpd.serve_forever()

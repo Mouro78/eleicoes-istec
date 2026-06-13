@@ -95,7 +95,7 @@ python data/gerar_csv.py
 
 **1. Arrancar o Servidor CNE** (manter a correr):
 ```powershell
-python src/eleicoes/servidor_cne.py
+$env:PYTHONPATH="src"; python src/eleicoes/servidor_cne.py
 ```
 
 **2. Correr o Produtor** (noutro terminal):
@@ -108,24 +108,37 @@ $env:PYTHONPATH="src"; python src/eleicoes/produtor.py
 $env:PYTHONPATH="src"; python src/eleicoes/exportador.py
 ```
 
-**4. Consultar resultados** (browser ou curl):
+**4. Arrancar o Servidor Público** (noutro terminal):
+```powershell
+$env:PYTHONPATH="src"; python src/eleicoes/servidor_publico.py
+```
+
+**5. Consultar resultados**:
 ```
 GET http://localhost:8000/totais
 GET http://localhost:8000/partidos
 GET http://localhost:8000/distritos
 ```
 
+Portal público: http://localhost:8001
+
 ### Testes
 
-```bash
-python -m unittest discover -v
+```powershell
+$env:PYTHONPATH="src"; python -m unittest discover -v
 ```
 
 ### Testes com cobertura
 
-```bash
-coverage run -m unittest discover
+```powershell
+$env:PYTHONPATH="src"; coverage run -m unittest discover
 coverage report
+```
+
+### Análise estática (pylint)
+
+```powershell
+pylint src/eleicoes
 ```
 
 ### Análise estática (pylint)

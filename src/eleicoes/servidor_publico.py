@@ -36,7 +36,7 @@ class ServidorPublico(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
         resultados = carregar_resultados()
 
-        # 1. Configurar cabeçalhos para responder em HTML (text/html)pip install pandas matplotlib openpyxl
+        # 1. Configurar cabeçalhos para responder em HTML (text/html)
         self.send_response(200)
         self.send_header("Content-type", "text/html; charset=utf-8")
         self.end_headers()

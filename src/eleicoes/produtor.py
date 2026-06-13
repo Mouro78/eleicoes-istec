@@ -1,52 +1,54 @@
 """
 Produtor de votos para o simulador de Eleições Legislativas Portuguesas.
 
-Lê data/freguesias.csv, gera votos aleatórios por freguesia e constrói
-a hierarquia completa Distrito -> Concelho -> Freguesia com resultados.
+Lê data/freguesias.csv, gera votos aleatórios por freguesia e envia
+os resultados ao Servidor CNE via HTTP POST.
 
 Uso:
-    python src/produtor.py
+    python src/eleicoes/produtor.py
 """
 
 import csv
 import random
 import os
-import requests  # <-- Nova importação para comunicar com o servidor
+import json
+import urllib.request
+import urllib.error
 
 from eleicoes.dominio.partido import Partido
 from eleicoes.dominio.freguesia import Freguesia
 from eleicoes.dominio.concelho import Concelho
 from eleicoes.dominio.distrito import Distrito
 
-# Seed fixa para resultados reprodutíveis (mesma que o gerar_csv.py)
+# Seed fixa para resultados reprodutíveis
 SEED = 42
-URL_SERVIDOR = "http://127.0.0.1:8000"  # <-- Endereço do teu servidor CNE
 
 # Ficheiro de dados
 FICHEIRO_CSV = os.path.join(
     os.path.dirname(__file__), "..", "..", "data", "freguesias.csv"
 )
 
+# URL do servidor CNE
+URL_SERVIDOR = "http://localhost:8000/resultados"
+
 # Partidos concorrentes nas legislativas 2024
 PARTIDOS = [
-    Partido("AD",    "Aliança Democrática"),
-    Partido("PS",    "Partido Socialista"),
-    Partido("CH",    "Chega"),
-    Partido("IL",    "Iniciativa Liberal"),
-    Partido("BE",    "Bloco de Esquerda"),
-    Partido("CDU",   "Coligação Democrática Unitária"),
-    Partido("L",     "Livre"),
-    Partido("PAN",   "Pessoas-Animais-Natureza"),
-    Partido("ADN",   "Alternativa Democrática Nacional"),
-    Partido("RIR",   "Reagir Incluir Reciclar"),
+    Partido("AD",  "Aliança Democrática"),
+    Partido("PS",  "Partido Socialista"),
+    Partido("CH",  "Chega"),
+    Partido("IL",  "Iniciativa Liberal"),
+    Partido("BE",  "Bloco de Esquerda"),
+    Partido("CDU", "Coligação Democrática Unitária"),
+    Partido("L",   "Livre"),
+    Partido("PAN", "Pessoas-Animais-Natureza"),
+    Partido("ADN", "Alternativa Democrática Nacional"),
+    Partido("RIR", "Reagir Incluir Reciclar"),
 ]
 
 
 def distribuir_votos_partidos(votos_validos, partidos, rng):
     """Distribui votos válidos proporcionalmente pelos partidos."""
-    pesos = []
-    for _ in partidos:
-        pesos.append(rng.random())
+    pesos = [rng.random() for _ in partidos]
     total_pesos = sum(pesos)
 
     votos_partido = {}
@@ -78,12 +80,29 @@ def carregar_csv(ficheiro):
         return list(csv.DictReader(f))
 
 
+def enviar_resultado(dados):
+    """Envia os resultados de uma freguesia ao Servidor CNE via POST."""
+    corpo = json.dumps(dados).encode("utf-8")
+    pedido = urllib.request.Request(URL_SERVIDOR, data=corpo, method="POST")
+    pedido.add_header("Content-Type", "application/json")
+
+    try:
+        with urllib.request.urlopen(pedido) as resposta:
+            return resposta.status == 200
+    except urllib.error.HTTPError as e:
+        print(f"  Erro HTTP {e.code} na freguesia {dados['nome_freguesia']}")
+        return False
+    except urllib.error.URLError as e:
+        print(f"  Erro de ligação: {e.reason}")
+        return False
+
+
 def construir_hierarquia(linhas, partidos, rng):
-    """Constrói a hierarquia e envia os dados de cada freguesia para o servidor CNE."""
+    """Constrói a hierarquia e envia cada freguesia ao Servidor CNE via POST."""
     distritos = {}
     concelhos = {}
-
-    print("A enviar dados das freguesias para o servidor...")
+    enviados = 0
+    erros = 0
 
     for linha in linhas:
         cod_distrito = linha["codigo_distrito"]
@@ -91,41 +110,36 @@ def construir_hierarquia(linhas, partidos, rng):
         cod_freguesia = linha["codigo_freguesia"]
         eleitores = int(linha["eleitores"])
 
-        # Criar Distrito se ainda não existe
         if cod_distrito not in distritos:
             distritos[cod_distrito] = Distrito(cod_distrito, linha["distrito"])
 
-        # Criar Concelho se ainda não existe
         if cod_concelho not in concelhos:
             concelho = Concelho(cod_concelho, linha["concelho"])
             concelhos[cod_concelho] = concelho
             distritos[cod_distrito].adicionar_concelho(concelho)
 
-        # Criar Freguesia e registar votos
         freguesia = Freguesia(cod_freguesia, linha["freguesia"], eleitores)
-        (votos_partido, brancos, nulos) = gerar_votos_freguesia(eleitores, partidos, rng)
+        votos_partido, brancos, nulos = gerar_votos_freguesia(eleitores, partidos, rng)
         freguesia.registar_resultado(votos_partido, brancos, nulos)
         concelhos[cod_concelho].adicionar_freguesia(freguesia)
 
-        # --- NOVA LÓGICA: Enviar dados via HTTP POST para o servidor ---
-        dados_freguesia = {
-            "codigo_freguesia": cod_freguesia,
-            "nome_freguesia": linha["freguesia"],
-            "distrito": linha["distrito"],
+        dados = {
+            "codigo_freguesia":    cod_freguesia,
+            "nome_freguesia":      linha["freguesia"],
+            "distrito":            linha["distrito"],
+            "concelho":            linha["concelho"],
             "eleitores_inscritos": eleitores,
-            "votos_partido": votos_partido,
-            "votos_brancos": brancos,
-            "votos_nulos": nulos
+            "votos_partido":       votos_partido,
+            "votos_brancos":       brancos,
+            "votos_nulos":         nulos,
         }
 
-        try:
-            requests.post(URL_SERVIDOR, json=dados_freguesia)
-        except requests.exceptions.ConnectionError:
-            # Se o servidor não estiver ligado, avisa e para para não inundar o terminal
-            print("\n[ERRO] Não foi possível ligar ao Servidor CNE! Certifica-te de que está ativo na porta 8000.")
-            return distritos
+        if enviar_resultado(dados):
+            enviados += 1
+        else:
+            erros += 1
 
-    print("Envio concluído com sucesso!\n")
+    print(f"\nEnviados: {enviados} | Erros: {erros}")
     return distritos
 
 
@@ -142,31 +156,9 @@ def simular_eleicao(ficheiro_csv=None, partidos=None, seed=SEED):
 
 
 def main():
-    """Ponto de entrada — simula e mostra resumo dos resultados."""
-    print("A simular eleição legislativa...\n")
-
-    distritos = simular_eleicao()
-
-    print(f"{'DISTRITO':<25} {'VENCEDOR':<8} {'VOTANTES':>10} {'ABSTENCAO':>10}")
-    print("-" * 60)
-
-    for distrito in distritos.values():
-        try:
-            vencedor = distrito.obter_vencedor()
-        except ValueError:
-            vencedor = "N/A"
-
-        votantes = distrito.obter_total_votantes()
-        abstencao = distrito.calcular_abstencao() * 100
-
-        print(
-            f"{distrito.obter_nome():<25} "
-            f"{vencedor:<8} "
-            f"{votantes:>10,} "
-            f"{abstencao:>9.1f}%"
-        )
-
-    print(f"\nTotal de distritos: {len(distritos)}")
+    """Ponto de entrada — simula e envia resultados ao Servidor CNE."""
+    print("A simular eleição legislativa e a enviar ao Servidor CNE...\n")
+    simular_eleicao()
 
 
 if __name__ == "__main__":

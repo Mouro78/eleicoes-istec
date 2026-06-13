@@ -19,7 +19,10 @@ de comunicação social. Compõe-se de três componentes:
 
 - Python 3.14
 - http.server (biblioteca padrão — servidores)
+- urllib.request (biblioteca padrão — comunicação HTTP)
 - unittest (biblioteca padrão — testes)
+- pandas (análise e exportação de dados)
+- matplotlib (gráficos)
 - coverage 7.14.0 (cobertura de testes)
 - pylint 4.0.5 (análise estática)
 
@@ -40,7 +43,9 @@ eleicoes-istec/
 │       │   ├── concelho.py
 │       │   └── distrito.py
 │       ├── produtor.py         # Simulador de votações
-│       └── servidor_cne.py     # Servidor CNE (http.server)
+│       ├── servidor_cne.py     # Servidor CNE (http.server)
+│       ├── exportador.py       # Exporta resultados para XLSX e gráfico
+│       └── gerar_csv.py        # Gera CSV de freguesias
 ├── tests/
 │   └── dominio/                # Testes unitários do domínio
 ├── pyproject.toml              # Configuração de pylint e coverage
@@ -86,19 +91,29 @@ python data/gerar_csv.py
 
 ## Como correr
 
-### Produtor de votos
+### Ordem correcta de execução
 
-```powershell
-$env:PYTHONPATH="src"; python src/eleicoes/produtor.py
-```
-
-### Servidor CNE
-
+**1. Arrancar o Servidor CNE** (manter a correr):
 ```powershell
 python src/eleicoes/servidor_cne.py
 ```
 
-O servidor fica disponível em: `http://127.0.0.1:8000`
+**2. Correr o Produtor** (noutro terminal):
+```powershell
+$env:PYTHONPATH="src"; python src/eleicoes/produtor.py
+```
+
+**3. Exportar resultados** (Excel e gráfico):
+```powershell
+$env:PYTHONPATH="src"; python src/eleicoes/exportador.py
+```
+
+**4. Consultar resultados** (browser ou curl):
+```
+GET http://localhost:8000/totais
+GET http://localhost:8000/partidos
+GET http://localhost:8000/distritos
+```
 
 ### Testes
 
@@ -132,11 +147,8 @@ pylint src/eleicoes
 - [x] Gerador de CSV com 3092 freguesias de Portugal
 - [x] Produtor de votos — simula eleição completa (pylint 10/10)
 - [x] Servidor CNE — recebe, valida e arquiva resultados (pylint 10/10)
-
-### Em desenvolvimento
-
-- [ ] Servidor Público (http.server)
-- [ ] Exportadores (JSON, XLSX, gráfico)
+- [X] Servidor Público (http.server)
+- [X] Exportadores (JSON, XLSX, gráfico)
 
 ### Bónus considerados
 

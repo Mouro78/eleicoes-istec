@@ -14,14 +14,18 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 
-FICHEIRO_RESULTADOS = os.path.join(
-    os.path.dirname(__file__), "..", "..", "data", "resultados.json"
+## Caminho para o ficheiro JSON com os resultados recebidos do Produtor
+
+FICHEIRO_RESULTADOS = os.path.join( #a pasta onde este ficheiro está" (src/eleicoes/)
+    os.path.dirname(__file__), "..", "..", "data", "resultados.json" 
 )
 
+# Caminho para o ficheiro Excel gerado com os resultados eleitorais
 FICHEIRO_EXCEL = os.path.join(
     os.path.dirname(__file__), "..", "..", "data", "resultados.xlsx"
 )
 
+# Caminho para o ficheiro de imagem com o gráfico de barras por partido
 FICHEIRO_GRAFICO = os.path.join(
     os.path.dirname(__file__), "..", "..", "data", "grafico.png"
 )
@@ -43,51 +47,50 @@ def calcular_totais(resultados):
             totais[partido] = totais.get(partido, 0) + votos
         totais["brancos"] += freguesia["votos_brancos"]
         totais["nulos"] += freguesia["votos_nulos"]
-    return totais
+    return totais 
 
 
 def calcular_distritos(resultados):
     """Agrupa os votos por distrito de forma segura."""
-    distritos = {}
-    for freguesia in resultados.values():
-        # Fallback caso tenhas ou não alterado o produtor.py para incluir o distrito
-        nome_distrito = freguesia.get("distrito", "Distrito " + freguesia["codigo_freguesia"][:2])
+    distritos = {} 
+    for freguesia in resultados.values(): 
+        nome_distrito = freguesia.get("distrito", "Distrito " + freguesia["codigo_freguesia"][:2])  
 
-        if nome_distrito not in distritos:
+        if nome_distrito not in distritos: 
             distritos[nome_distrito] = {"brancos": 0, "nulos": 0}
-        for partido, votos in freguesia["votos_partido"].items():
+        for partido, votos in freguesia["votos_partido"].items():        
             distritos[nome_distrito][partido] = (
                 distritos[nome_distrito].get(partido, 0) + votos
             )
-        distritos[nome_distrito]["brancos"] += freguesia["votos_brancos"]
+        distritos[nome_distrito]["brancos"] += freguesia["votos_brancos"] 
         distritos[nome_distrito]["nulos"] += freguesia["votos_nulos"]
-    return distritos
+    return distritos 
 
 
 def exportar_excel(resultados):
     """Exporta os resultados para ficheiro Excel com 3 folhas (Exigido em Aula)."""
-    totais = calcular_totais(resultados)
+    totais = calcular_totais(resultados) 
 
     # --- Folha 1: Totais Nacionais ---
-    df_totais = pd.DataFrame(
+    df_totais = pd.DataFrame(   
         list(totais.items()),
-        columns=["Partido/Registo", "Votos"]
+        columns=["Partido/Registo", "Votos"] 
     )
-    df_totais = df_totais.sort_values("Votos", ascending=False).reset_index(drop=True)
+    df_totais = df_totais.sort_values("Votos", ascending=False).reset_index(drop=True) 
 
     # --- Folha 2: Partidos com percentagem real (excluindo brancos/nulos do bolo partidário) ---
-    partidos_puros = {k: v for k, v in totais.items() if k not in ("brancos", "nulos")}
-    total_votos_partidos = sum(partidos_puros.values())
+    partidos_puros = {k: v for k, v in totais.items() if k not in ("brancos", "nulos")} 
+    total_votos_partidos = sum(partidos_puros.values()) 
 
     df_partidos = pd.DataFrame(list(partidos_puros.items()), columns=["Partido", "Votos"])
     df_partidos = df_partidos.sort_values("Votos", ascending=False).reset_index(drop=True)
-    df_partidos["Percentagem (%)"] = (
+    df_partidos["Percentagem (%)"] = ( 
         df_partidos["Votos"] / total_votos_partidos * 100
     ).round(2)
 
     # --- Folha 3: Distritos ---
     distritos = calcular_distritos(resultados)
-    df_distritos = pd.DataFrame(distritos).T
+    df_distritos = pd.DataFrame(distritos).T 
     df_distritos.index.name = "Distrito"
     df_distritos = df_distritos.fillna(0).astype(int)
     df_distritos = df_distritos.reset_index()
